@@ -63,15 +63,15 @@ private class AppViewHolder(viewGroup: ViewGroup) :
     val appId: TextView by lazy { itemView.findViewById<TextView>(R.id.appId) }
 
 
-    fun render(appEntity: AppEntity) {
+    fun render(appEntity: AppWithIcon) {
         appIcon.setImageDrawable(appEntity.icon)
-        appName.text = appEntity.name
-        appId.text = appEntity.appId
+        appName.text = appEntity.appEntity.name
+        appId.text = appEntity.appEntity.appId
     }
 
 }
 
-private class AppListAdapter(val appEntities: List<AppEntity>) : RecyclerView.Adapter<AppViewHolder>() {
+private class AppListAdapter(val appEntities: List<AppWithIcon>) : RecyclerView.Adapter<AppViewHolder>() {
     override fun onCreateViewHolder(viewGroup: ViewGroup, p1: Int) = AppViewHolder(viewGroup)
     override fun getItemCount() = appEntities.size
     override fun onBindViewHolder(p0: AppViewHolder, p1: Int) = p0.render(appEntities[p1])

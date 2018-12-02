@@ -4,13 +4,14 @@ import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
 import android.content.pm.PackageManager
+import com.pokercc.saveappimage.database.AppEntity
 import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 
 class EditAppListViewModel(application: Application) : AndroidViewModel(application) {
-    data class AppItem(val appEntity: AppEntity, var selected: Boolean)
+    data class AppItem(val appEntity: AppWithIcon, var selected: Boolean)
 
     /**
      * app列表
@@ -31,14 +32,17 @@ class EditAppListViewModel(application: Application) : AndroidViewModel(applicat
 
     }
 
+    @Suppress("DEPRECATION")
     private fun getInstallApps(): List<AppItem> {
         val packageManager = getApplication<Application>().packageManager
         return packageManager
             .getInstalledApplications(PackageManager.GET_UNINSTALLED_PACKAGES)
             .map {
-                AppEntity(
-                    it.packageName,
-                    packageManager.getApplicationLabel(it)?.toString() ?: "",
+                AppWithIcon(
+                    AppEntity(
+                        it.packageName,
+                        packageManager.getApplicationLabel(it)?.toString() ?: ""
+                    ),
                     it.loadIcon(packageManager)
                 )
             }

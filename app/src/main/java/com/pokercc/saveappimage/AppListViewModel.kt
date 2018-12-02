@@ -9,6 +9,6 @@ class AppListViewModel : ViewModel() {
     /**
      * app列表
      */
-    val appEntities: LiveData<List<AppEntity>> = MutableLiveData()
+    val appEntities: LiveData<List<AppWithIcon>> = MutableLiveData()
 }
 

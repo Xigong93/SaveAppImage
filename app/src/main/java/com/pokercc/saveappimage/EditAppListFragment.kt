@@ -64,12 +64,17 @@ private class EditAppViewHolder(viewGroup: ViewGroup) :
     val appName: TextView by lazy { itemView.findViewById<TextView>(R.id.appName) }
     val appId: TextView by lazy { itemView.findViewById<TextView>(R.id.appId) }
     val checkBox: CheckBox by lazy { itemView.findViewById<CheckBox>(R.id.checkbox) }
+    init {
+        itemView.setOnClickListener {
+            checkBox.performClick()
+        }
+    }
 
 
     fun render(appItem: EditAppListViewModel.AppItem) {
         appIcon.setImageDrawable(appItem.appEntity.icon)
-        appName.text = appItem.appEntity.name
-        appId.text = appItem.appEntity.appId
+        appName.text = appItem.appEntity.appEntity.name
+        appId.text =appItem.appEntity.appEntity.appId
         checkBox.isChecked = appItem.selected
     }
 
