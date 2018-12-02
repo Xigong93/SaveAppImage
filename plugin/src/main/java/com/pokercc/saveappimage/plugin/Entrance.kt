@@ -3,13 +3,9 @@ package com.pokercc.saveappimage.plugin
 
 import android.app.Activity
 import android.app.AndroidAppHelper
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.PixelFormat
-import android.graphics.drawable.Drawable
+import android.content.Context
 import android.os.Environment
 import android.view.Gravity
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
@@ -19,10 +15,13 @@ import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
+import de.robv.android.xposed.XposedHelpers.findAndHookMethod
+import de.robv.android.xposed.XposedHelpers.findClass
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.io.File
-import java.io.FileOutputStream
 import java.util.*
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.atomic.AtomicReference
 
 
 /**
@@ -32,16 +31,39 @@ class Entrance : IXposedHookLoadPackage {
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
 
         XposedBridge.log("handleLoadPackage执行啦!")
-        val context = AndroidAppHelper.currentApplication().applicationContext
-        val appEntities = AppEntityModule.provideOtherProcessAppEntityDao(context).queryAll()
-        val appIdSet = appEntities
-            .map { it.appId }
-            .toSet()
-        XposedBridge.log("开启的app列表:$appIdSet")
-        if (appIdSet.contains(lpparam.packageName)) {
-            XposedBridge.log("开始hook:${lpparam.packageName}")
-            hookTestApp(lpparam)
+
+        getContext(lpparam)
+    }
+
+    private fun getContext(lpparam: XC_LoadPackage.LoadPackageParam) {
+
+        try {
+            val contextClass = findClass("android.content.ContextWrapper", lpparam.classLoader)
+            findAndHookMethod(contextClass, "getApplicationContext", object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam?) {
+                    super.afterHookedMethod(param)
+                    param?.apply {
+                        XposedBridge.log("CSDN_LQR-->得到上下文")
+
+                        val appEntities = AppEntityModule.provideOtherProcessAppEntityDao(result as Context).queryAll()
+                        val appIdSet = appEntities
+                            .map { it.appId }
+                            .toSet()
+                        XposedBridge.log("开启的app列表:$appIdSet")
+                        if (appIdSet.contains(lpparam.packageName)) {
+                            XposedBridge.log("开始hook:${lpparam.packageName}")
+                            hookTestApp(lpparam)
+                        }
+                    }
+
+
+                }
+            });
+        } catch (t: Throwable) {
+            XposedBridge.log("CSDN_LQR-->获取上下文出错");
+            XposedBridge.log(t)
         }
+
     }
 
     private fun hookTestApp(lpparam: XC_LoadPackage.LoadPackageParam) {
