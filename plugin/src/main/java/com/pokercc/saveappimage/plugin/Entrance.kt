@@ -2,6 +2,7 @@ package com.pokercc.saveappimage.plugin
 
 
 import android.app.Activity
+import android.app.AndroidAppHelper
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.PixelFormat
@@ -13,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.PopupWindow
+import com.pokercc.saveappimage.database.AppEntityModule
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
@@ -23,17 +25,21 @@ import java.io.FileOutputStream
 import java.util.*
 
 
-const val TARGET_PACKAGE_NAME = "com.pokercc.textdemo"
-
 /**
  * 插件入口
  */
 class Entrance : IXposedHookLoadPackage {
-    override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam?) {
+    override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
 
         XposedBridge.log("handleLoadPackage执行啦!")
-        if (TARGET_PACKAGE_NAME == lpparam?.packageName) {
-            XposedBridge.log("开始hook测试程序!")
+        val context = AndroidAppHelper.currentApplication().applicationContext
+        val appEntities = AppEntityModule.provideOtherProcessAppEntityDao(context).queryAll()
+        val appIdSet = appEntities
+            .map { it.appId }
+            .toSet()
+        XposedBridge.log("开启的app列表:$appIdSet")
+        if (appIdSet.contains(lpparam.packageName)) {
+            XposedBridge.log("开始hook:${lpparam.packageName}")
             hookTestApp(lpparam)
         }
     }
@@ -70,7 +76,8 @@ class Entrance : IXposedHookLoadPackage {
         XposedBridge.log("开始保存图片")
         val rootView = activity.findViewById<ViewGroup>(android.R.id.content)
         val subViews = rootView.allViews()
-        val parentFile = Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES)
+        val parentFile =
+            Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES)
         subViews
             .filter { it is ImageView }
             .filter { it.background != null }

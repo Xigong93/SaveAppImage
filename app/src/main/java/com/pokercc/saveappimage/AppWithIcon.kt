@@ -5,5 +5,5 @@ import com.pokercc.saveappimage.database.AppEntity
 
 data class AppWithIcon(
     val appEntity: AppEntity,
-    val icon: Drawable
+    val icon: Drawable?
 )

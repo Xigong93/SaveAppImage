@@ -1,0 +1,7 @@
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto" app:startDestination="@id/appList">
+    <fragment android:name="com.pokercc.saveappimage.AppListFragment" android:id="@+id/appList">
+        <action android:id="@+id/actionToEditAppList" app:destination="@id/editAppList"/>
+    </fragment>
+    <fragment android:name="com.pokercc.saveappimage.EditAppListFragment" android:id="@+id/editAppList"/>
+</navigation>

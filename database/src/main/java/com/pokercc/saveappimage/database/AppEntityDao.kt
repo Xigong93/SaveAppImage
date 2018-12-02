@@ -1,17 +1,15 @@
 package com.pokercc.saveappimage.database
 
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Delete
-import android.arch.persistence.room.Insert
-import android.arch.persistence.room.Query
+import android.arch.persistence.room.*
 import android.database.Cursor
 
 @Dao
 interface AppEntityDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(appEntity: AppEntity)
 
-    @Insert
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(appEntities: List<AppEntity>)
 
     @Delete
