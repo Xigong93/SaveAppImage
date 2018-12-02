@@ -8,7 +8,7 @@ class OtherProcessAppEntityDaoImpl(val context: Context) : OtherProcessAppEntity
 
     override fun queryAll(): List<AppEntity> {
         val appEntities = mutableListOf<AppEntity>()
-        val cursor: Cursor? = context.contentResolver.query(Uri.EMPTY, null, null, null, null)
+        val cursor: Cursor? = context.contentResolver.query(Uri.parse(APP_LIST_CONTENT_PROVIDER_QUERY_ALL), null, null, null, null)
         cursor?.apply {
             while (cursor.moveToNext()) {
                 val appId = cursor.getString(cursor.getColumnIndex(APP_ID))

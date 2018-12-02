@@ -5,12 +5,14 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
 
+const val APP_LIST_CONTENT_PROVIDER_QUERY_ALL = "content://com.pokercc.saveappimage.database.AppListContentProvider/app_list/list"
+
 /**
  * app列表的内容提供者
  */
 class AppListContentProvider : ContentProvider() {
 
-    val appEntityDao: AppEntityDao by lazy {
+    private val appEntityDao: AppEntityDao by lazy {
         AppEntityModule.provideAppEntityDao(context!!)
     }
 

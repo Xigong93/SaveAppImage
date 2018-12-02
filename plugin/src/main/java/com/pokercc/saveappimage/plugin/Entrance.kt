@@ -78,55 +78,5 @@ class Entrance : IXposedHookLoadPackage {
             .forEach { it.save(File(parentFile, UUID.randomUUID().toString() + ".png")) }
     }
 
-    /**
-     * drawable转bitmap
-     */
-    private fun Drawable.toBitmap(): Bitmap {
-        val bitmap = Bitmap.createBitmap(
-            intrinsicWidth,
-            intrinsicHeight,
-            if (opacity != PixelFormat.OPAQUE)
-                Bitmap.Config.ARGB_8888
-            else
-                Bitmap.Config.RGB_565
-        )
-        setBounds(0, 0, intrinsicWidth, intrinsicHeight);
-        draw(Canvas(bitmap))
-        return bitmap
-    }
 
-    /**
-     * 保存bitmap
-     */
-    private fun Bitmap.save(file: File) {
-        file.parentFile?.mkdirs()
-        var outputStream: FileOutputStream? = null
-        try {
-            outputStream = file.outputStream()
-            compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-            XposedBridge.log("开始保存$file 成功")
-        } catch (e: Exception) {
-            outputStream?.close()
-            XposedBridge.log("开始保存$file 失败")
-        } finally {
-            recycle()
-        }
-
-    }
-
-
-    /**
-     * 递归查找全部的子view
-     */
-    private fun ViewGroup.allViews(): List<View> {
-        val views = mutableListOf<View>()
-        for (i in 0 until childCount) {
-            val child = getChildAt(i)
-            views.add(child)
-            if (child is ViewGroup) {
-                views.addAll(child.allViews())
-            }
-        }
-        return views.toList()
-    }
 }

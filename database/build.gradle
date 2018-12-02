@@ -48,6 +48,3 @@ dependencies {
     testImplementation "android.arch.persistence.room:testing:$room_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
-repositories {
-    mavenCentral()
-}

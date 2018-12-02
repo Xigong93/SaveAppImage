@@ -25,4 +25,7 @@ interface AppEntityDao {
 
     @Query("SELECT * FROM app_entity")
     fun queryAllToCursor(): Cursor
+
+    @Query("DELETE FROM app_entity")
+    fun clear()
 }

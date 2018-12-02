@@ -5,7 +5,7 @@
     <application>
         <provider
                 android:name=".AppListContentProvider"
-                android:authorities="com.pokercc.saveappimage.applist"
+                android:authorities="com.pokercc.saveappimage.database.AppListContentProvider"
                 android:enabled="true"
                 android:exported="true">
         </provider>
