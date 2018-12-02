@@ -1,4 +1,4 @@
-package com.pokercc.save_app_image.plugin
+package com.pokercc.saveappimage.plugin
 
 
 import android.app.Activity
