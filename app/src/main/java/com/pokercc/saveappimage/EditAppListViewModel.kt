@@ -14,7 +14,7 @@ import io.reactivex.schedulers.Schedulers
 
 
 class EditAppListViewModel(application: Application) : AndroidViewModel(application) {
-    data class AppItem(val appWithIcon: AppWithIcon, var selected: Boolean = false)
+    data class AppItem(val appEntity: AppEntity, var selected: Boolean = false)
 
     /**
      * app列表
@@ -65,17 +65,9 @@ class EditAppListViewModel(application: Application) : AndroidViewModel(applicat
                 )
             }
             .map {
-                AppWithIcon(
-                    it,
-                    packageManager.getApplicationInfo(it.appId, PackageManager.GET_UNINSTALLED_PACKAGES).loadIcon(
-                        packageManager
-                    )
-                )
-            }
-            .map {
                 AppItem(
                     it,
-                    enableAppList.enable(getApplication(), it.appEntity.appId)
+                    enableAppList.enable(getApplication(), it.appId)
                 )
             }
             .subscribeOn(Schedulers.io())
@@ -101,7 +93,7 @@ class EditAppListViewModel(application: Application) : AndroidViewModel(applicat
                 saveAppListState.postValue(SaveAppListState.LOADING)
             }
             .filter { it.selected }
-            .map { it.appWithIcon.appEntity }
+            .map { it.appEntity }
             .toList()
             .doOnSuccess {
                 appEntityDao.clear()

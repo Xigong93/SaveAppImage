@@ -103,9 +103,9 @@ private class EditAppViewHolder(viewGroup: ViewGroup) :
 
 
     fun render(appItem: EditAppListViewModel.AppItem) {
-        appIcon.setImageDrawable(appItem.appWithIcon.icon)
-        appName.text = appItem.appWithIcon.appEntity.name
-        appId.text = appItem.appWithIcon.appEntity.appId
+        AppIconLoader.loadAppIcon(appItem.appEntity.appId, appIcon)
+        appName.text = appItem.appEntity.name
+        appId.text = appItem.appEntity.appId
         checkBox.isChecked = appItem.selected
         checkBox.setOnCheckedChangeListener { buttonView, isChecked -> appItem.selected = isChecked }
     }
