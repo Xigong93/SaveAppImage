@@ -106,8 +106,10 @@ private class EditAppViewHolder(viewGroup: ViewGroup) :
         AppIconLoader.loadAppIcon(appItem.appEntity.appId, appIcon)
         appName.text = appItem.appEntity.name
         appId.text = appItem.appEntity.appId
+        // 去掉之前的监听器，避免设置下面的状态产生影响
+        checkBox.setOnCheckedChangeListener(null)
         checkBox.isChecked = appItem.selected
-        checkBox.setOnCheckedChangeListener { buttonView, isChecked -> appItem.selected = isChecked }
+        checkBox.setOnCheckedChangeListener { _, isChecked -> appItem.selected = isChecked }
     }
 
 }
