@@ -27,10 +27,9 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
 
         disposable = Flowable
             .defer {
-                Flowable.fromIterable(appEntityDao.queryAll())
+                Flowable.just(appEntityDao.queryAll())
             }
             .subscribeOn(Schedulers.io())
-            .toList()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { it -> appEntities.setValue(it) }
     }

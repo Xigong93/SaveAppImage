@@ -23,6 +23,7 @@ internal abstract class AppEntityDatabase : RoomDatabase() {
         private fun buildDatabase(context: Context): AppEntityDatabase {
             return Room
                 .databaseBuilder<AppEntityDatabase>(context, AppEntityDatabase::class.java, DATABASE_FILE_NAME)
+                .allowMainThreadQueries()
                 .build()
         }
     }
