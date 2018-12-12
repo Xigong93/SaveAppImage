@@ -16,7 +16,10 @@ import java.security.MessageDigest
 /**
  * drawable转bitmap
  */
-fun Drawable.toBitmap(): Bitmap {
+fun Drawable.toBitmap(): Bitmap? {
+    if (intrinsicWidth < 0 || intrinsicHeight < 0) {
+        return null
+    }
     val bitmap = Bitmap.createBitmap(
         intrinsicWidth,
         intrinsicHeight,

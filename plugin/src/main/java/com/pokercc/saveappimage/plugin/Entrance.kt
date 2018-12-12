@@ -4,7 +4,9 @@ package com.pokercc.saveappimage.plugin
 import android.app.Activity
 import android.app.AndroidAppHelper
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
 import android.os.Environment
 import android.view.Gravity
 import android.view.ViewGroup
@@ -102,11 +104,19 @@ class Entrance : IXposedHookLoadPackage {
         parentFile = File(parentFile, activity.applicationInfo.packageName)
         parentFile = File(parentFile, activity::class.java.simpleName)
         parentFile.mkdirs()
+
+        val save: (Bitmap) -> Unit = { it.save(File(parentFile, it.md5() + ".png")) }
+        // 保存image的图片
         subViews
             .filter { it is ImageView }
-            .filter { it.background != null }
-            .map { it.background.toBitmap() }
-            .forEach { it.save(File(parentFile, it.md5() + ".png")) }
+            .filter { (it as ImageView).drawable is BitmapDrawable }
+            .mapNotNull { (it as ImageView).drawable.toBitmap() }
+            .forEach(save)
+        // 保存view 的背景
+        subViews
+            .filter { it.background is BitmapDrawable }
+            .mapNotNull { it.background.toBitmap() }
+            .forEach(save)
         Toast.makeText(rootView.context, "保存成功!", Toast.LENGTH_SHORT).show()
     }
 

@@ -58,6 +58,8 @@ class EditAppListViewModel(application: Application) : AndroidViewModel(applicat
             .defer {
                 Flowable.fromIterable(packageManager.getInstalledApplications(PackageManager.GET_UNINSTALLED_PACKAGES))
             }
+            //不是自己
+            .filter { it.packageName != getApplication<Application>().packageName }
             .map {
                 AppEntity(
                     it.packageName,
