@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.os.Environment
 import android.view.Gravity
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.*
 import com.pokercc.saveappimage.database.AppEntityModule
 import de.robv.android.xposed.IXposedHookLoadPackage
@@ -89,8 +90,9 @@ class Entrance : IXposedHookLoadPackage {
                 saveDrawable(activity)
             }
         }
-        val layoutParams = FrameLayout.LayoutParams(300, 200).also {
-            it.gravity = Gravity.BOTTOM
+        val layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, 200).also {
+            it.gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+            it.setMargins(30, 30, 30, 30)
         }
         (rootView.rootView as ViewGroup).addView(button, layoutParams)
     }
@@ -105,18 +107,25 @@ class Entrance : IXposedHookLoadPackage {
         parentFile = File(parentFile, activity::class.java.simpleName)
         parentFile.mkdirs()
 
-        val save: (Bitmap) -> Unit = { it.save(File(parentFile, it.md5() + ".png")) }
         // 保存image的图片
         subViews
             .filter { it is ImageView }
             .filter { (it as ImageView).drawable is BitmapDrawable }
             .mapNotNull { (it as ImageView).drawable.toBitmap() }
-            .forEach(save)
+            .forEach { it.save(File(parentFile, "img_${it.md5()}.png")) }
         // 保存view 的背景
         subViews
             .filter { it.background is BitmapDrawable }
             .mapNotNull { it.background.toBitmap() }
-            .forEach(save)
+            .forEach { it.save(File(parentFile, "bg_${it.md5()}.png")) }
+        // TextView的其他Drawable
+        subViews
+            .filter { it is TextView }
+            .map { (it as TextView).compoundDrawables }
+            .flatMap { it.toList() }
+            .filterNotNull()
+            .mapNotNull { it.toBitmap() }
+            .forEach { it.save(File(parentFile, "cd_${it.md5()}.png")) }
         Toast.makeText(rootView.context, "保存成功!", Toast.LENGTH_SHORT).show()
     }
 
