@@ -45,7 +45,7 @@ class FunctionDialog(context: Context) : Dialog(context, android.R.style.Theme_D
                     }
                     button("保存全部") {
                         onClick {
-                            saveall(context as Activity)
+                            saveall(context.activity())
                         }
                     }.lparams {
                         width = MATCH_PARENT

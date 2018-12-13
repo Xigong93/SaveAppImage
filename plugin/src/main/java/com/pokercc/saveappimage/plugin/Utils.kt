@@ -1,5 +1,8 @@
 package com.pokercc.saveappimage.plugin
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.PixelFormat
@@ -88,4 +91,14 @@ fun ViewGroup.allViews(): List<View> {
         }
     }
     return views.toList()
+}
+
+fun Context.activity(): Activity {
+    var context = this
+    while (context !is Activity) {
+        if (context is ContextWrapper) {
+            context = context.baseContext
+        }
+    }
+    return context
 }
