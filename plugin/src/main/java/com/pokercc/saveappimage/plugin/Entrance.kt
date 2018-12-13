@@ -10,6 +10,7 @@ import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.os.Environment
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
@@ -86,64 +87,28 @@ class Entrance : IXposedHookLoadPackage {
             })
     }
 
+
     private fun hookActivity(activity: Activity) {
         val rootView = activity.findViewById<ViewGroup>(android.R.id.content)
+        if (rootView.findViewWithTag<View>(BUTTON_TAG) != null) {
+            return
+        }
         val button = Button(activity).apply {
             text = "保存drawable"
+            tag = BUTTON_TAG
+            setPadding(10, 5, 10, 5)
             setBackgroundColor(Color.YELLOW)
             setOnClickListener {
-                saveDrawable(activity)
+                FunctionDialog(activity).show()
             }
         }
-        val layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).also {
-            it.gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-            it.setMargins(30, 30, 30, 30)
-        }
-        (rootView.rootView as ViewGroup).addView(button, layoutParams)
-    }
 
-    private fun saveDrawable(activity: Activity) {
-        XposedBridge.log("开始保存图片")
-        val rootView = activity.findViewById<ViewGroup>(android.R.id.content)
-        val subViews = rootView.allViews()
-
-        var parentFile = File(Environment.getExternalStorageDirectory(), "appDrawables")
-        parentFile = File(parentFile, activity.applicationInfo.packageName)
-        parentFile = File(parentFile, activity::class.java.simpleName)
-        parentFile.mkdirs()
-
-        val progressDialog = ProgressDialog.show(rootView.context, null, "保存中...", true, false)
-        // 保存image的图片
-        Completable.complete()
-            .doOnComplete {
-                subViews
-                    .filter { it is ImageView }
-                    .filter { (it as ImageView).drawable is BitmapDrawable }
-                    .mapNotNull { (it as ImageView).drawable.toBitmap() }
-                    .forEach { it.save(File(parentFile, "img_${it.md5()}.png")) }
-                // 保存view 的背景
-                subViews
-                    .filter { it.background is BitmapDrawable }
-                    .mapNotNull { it.background.toBitmap() }
-                    .forEach { it.save(File(parentFile, "bg_${it.md5()}.png")) }
-                // TextView的其他Drawable
-                subViews
-                    .filter { it is TextView }
-                    .map { (it as TextView).compoundDrawables }
-                    .flatMap { it.toList() }
-                    .filterNotNull()
-                    .mapNotNull { it.toBitmap() }
-                    .forEach { it.save(File(parentFile, "cd_${it.md5()}.png")) }
-            }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnComplete {
-                Toast.makeText(rootView.context, "保存成功!", Toast.LENGTH_SHORT).show()
-            }
-            .doFinally {
-                progressDialog.dismiss()
-            }
-            .subscribe()
+        (rootView.rootView as ViewGroup)
+            .addView(button, FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+                .also {
+                    it.gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+                    it.bottomMargin = 30
+                })
     }
 
 

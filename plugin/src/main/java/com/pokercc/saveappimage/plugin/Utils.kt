@@ -13,6 +13,8 @@ import java.io.FileOutputStream
 import java.math.BigInteger
 import java.security.MessageDigest
 
+
+const val BUTTON_TAG = "pokercc.android.savedrawable"
 /**
  * drawable转bitmap
  */
