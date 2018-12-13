@@ -20,16 +20,15 @@ fun Drawable.toBitmap(): Bitmap? {
     if (intrinsicWidth < 0 || intrinsicHeight < 0) {
         return null
     }
+    val drawable = mutate()
     val bitmap = Bitmap.createBitmap(
         intrinsicWidth,
         intrinsicHeight,
-        if (opacity != PixelFormat.OPAQUE)
-            Bitmap.Config.ARGB_8888
-        else
-            Bitmap.Config.RGB_565
+        Bitmap.Config.ARGB_8888
     )
-    setBounds(0, 0, intrinsicWidth, intrinsicHeight);
-    draw(Canvas(bitmap))
+    drawable.callback = null
+    drawable.setBounds(0, 0, intrinsicWidth, intrinsicHeight)
+    drawable.draw(Canvas(bitmap))
     return bitmap
 }
 

@@ -3,6 +3,7 @@ package com.pokercc.saveappimage.plugin
 
 import android.app.Activity
 import android.app.AndroidAppHelper
+import android.app.ProgressDialog
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -11,6 +12,7 @@ import android.os.Environment
 import android.view.Gravity
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.*
 import com.pokercc.saveappimage.database.AppEntityModule
 import de.robv.android.xposed.IXposedHookLoadPackage
@@ -20,6 +22,9 @@ import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.XposedHelpers.findAndHookMethod
 import de.robv.android.xposed.XposedHelpers.findClass
 import de.robv.android.xposed.callbacks.XC_LoadPackage
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import java.io.File
 import java.nio.file.Paths
 import java.util.*
@@ -90,7 +95,7 @@ class Entrance : IXposedHookLoadPackage {
                 saveDrawable(activity)
             }
         }
-        val layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, 200).also {
+        val layoutParams = FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).also {
             it.gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
             it.setMargins(30, 30, 30, 30)
         }
@@ -107,26 +112,38 @@ class Entrance : IXposedHookLoadPackage {
         parentFile = File(parentFile, activity::class.java.simpleName)
         parentFile.mkdirs()
 
+        val progressDialog = ProgressDialog.show(rootView.context, null, "保存中...", true, false)
         // 保存image的图片
-        subViews
-            .filter { it is ImageView }
-            .filter { (it as ImageView).drawable is BitmapDrawable }
-            .mapNotNull { (it as ImageView).drawable.toBitmap() }
-            .forEach { it.save(File(parentFile, "img_${it.md5()}.png")) }
-        // 保存view 的背景
-        subViews
-            .filter { it.background is BitmapDrawable }
-            .mapNotNull { it.background.toBitmap() }
-            .forEach { it.save(File(parentFile, "bg_${it.md5()}.png")) }
-        // TextView的其他Drawable
-        subViews
-            .filter { it is TextView }
-            .map { (it as TextView).compoundDrawables }
-            .flatMap { it.toList() }
-            .filterNotNull()
-            .mapNotNull { it.toBitmap() }
-            .forEach { it.save(File(parentFile, "cd_${it.md5()}.png")) }
-        Toast.makeText(rootView.context, "保存成功!", Toast.LENGTH_SHORT).show()
+        Completable.complete()
+            .doOnComplete {
+                subViews
+                    .filter { it is ImageView }
+                    .filter { (it as ImageView).drawable is BitmapDrawable }
+                    .mapNotNull { (it as ImageView).drawable.toBitmap() }
+                    .forEach { it.save(File(parentFile, "img_${it.md5()}.png")) }
+                // 保存view 的背景
+                subViews
+                    .filter { it.background is BitmapDrawable }
+                    .mapNotNull { it.background.toBitmap() }
+                    .forEach { it.save(File(parentFile, "bg_${it.md5()}.png")) }
+                // TextView的其他Drawable
+                subViews
+                    .filter { it is TextView }
+                    .map { (it as TextView).compoundDrawables }
+                    .flatMap { it.toList() }
+                    .filterNotNull()
+                    .mapNotNull { it.toBitmap() }
+                    .forEach { it.save(File(parentFile, "cd_${it.md5()}.png")) }
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnComplete {
+                Toast.makeText(rootView.context, "保存成功!", Toast.LENGTH_SHORT).show()
+            }
+            .doFinally {
+                progressDialog.dismiss()
+            }
+            .subscribe()
     }
 
 
