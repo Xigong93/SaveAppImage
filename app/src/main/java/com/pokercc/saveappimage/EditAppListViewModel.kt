@@ -60,6 +60,8 @@ class EditAppListViewModel(application: Application) : AndroidViewModel(applicat
             }
             //不是自己
             .filter { it.packageName != getApplication<Application>().packageName }
+            //不是virtualXposed
+            .filter { it.packageName != "de.robv.android.xposed.installer" }
             .map {
                 AppEntity(
                     it.packageName,
