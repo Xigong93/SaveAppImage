@@ -9,6 +9,7 @@ import android.graphics.PixelFormat
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import de.robv.android.xposed.XposedBridge
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -102,3 +103,7 @@ fun Context.activity(): Activity {
     }
     return context
 }
+
+//fun Context.toast(message: String) {
+//    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+//}

@@ -5,10 +5,13 @@ import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Environment
+import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -18,6 +21,8 @@ import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.button
 import org.jetbrains.anko.sdk27.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onLongClick
+import org.jetbrains.anko.toast
 import org.jetbrains.anko.verticalLayout
 import java.io.File
 
@@ -29,8 +34,8 @@ class FunctionDialog(context: Context) : Dialog(context, android.R.style.Theme_D
                 verticalLayout {
                     button("选择单个View") {
                         onClick {
-                            Toast.makeText(context, "选择单个View", Toast.LENGTH_SHORT).show()
-
+                            selectSingleView(context.activity())
+                            dismiss()
                         }
                     }.lparams {
                         width = MATCH_PARENT
@@ -38,6 +43,7 @@ class FunctionDialog(context: Context) : Dialog(context, android.R.style.Theme_D
                     button("选择多个View") {
                         onClick {
                             Toast.makeText(context, "选择多个View", Toast.LENGTH_SHORT).show()
+                            dismiss()
 
                         }
                     }.lparams {
@@ -46,6 +52,7 @@ class FunctionDialog(context: Context) : Dialog(context, android.R.style.Theme_D
                     button("保存全部") {
                         onClick {
                             saveall(context.activity())
+                            dismiss()
                         }
                     }.lparams {
                         width = MATCH_PARENT
@@ -55,6 +62,32 @@ class FunctionDialog(context: Context) : Dialog(context, android.R.style.Theme_D
             .view
             .apply {
                 setContentView(this)
+            }
+    }
+
+    /**
+     * 选择单个view
+     */
+    fun selectSingleView(activity: Activity) {
+        val rootView = activity.findViewById<ViewGroup>(android.R.id.content)
+        val subViews = rootView.allViews()
+        subViews
+            .filter { it is ViewGroup }
+            .filter { it !is AdapterView<*> }
+            .forEach {
+                it.onLongClick {
+                    activity.toast("放大ViewGroup")
+                    true
+                }
+                it.isClickable = false
+                it.setOnClickListener(null)
+            }
+        subViews
+            .filter { it !is ViewGroup }
+            .forEach {
+                it.onClick { it ->
+                    ViewPropertyDialog(it!!).show()
+                }
             }
     }
 
@@ -75,7 +108,7 @@ class FunctionDialog(context: Context) : Dialog(context, android.R.style.Theme_D
             .doOnComplete {
                 subViews
                     .filter { it is ImageView }
-                    .filter { (it as ImageView).drawable is BitmapDrawable }
+                    .filter { (it as ImageView).drawable is Drawable }
                     .mapNotNull { (it as ImageView).drawable.toBitmap() }
                     .forEach { it.save(File(parentFile, "img_${it.md5()}.png")) }
                 // 保存view 的背景
