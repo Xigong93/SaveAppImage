@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.PixelFormat
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -102,6 +103,16 @@ fun Context.activity(): Activity {
         }
     }
     return context
+}
+
+fun String.log() {
+    XposedBridge.log(this)
+    Log.d("SaveAppImage", this)
+}
+
+fun Throwable.log() {
+    XposedBridge.log(this)
+    Log.d("SaveAppImage", this.message, this)
 }
 
 //fun Context.toast(message: String) {
