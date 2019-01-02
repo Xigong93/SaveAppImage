@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Environment
+import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.AdapterView
@@ -25,7 +26,14 @@ import org.jetbrains.anko.toast
 import org.jetbrains.anko.verticalLayout
 import java.io.File
 
-class FunctionDialog(context: Context) : Dialog(context, android.R.style.Theme_DeviceDefault_Light_Dialog) {
+interface FunctionDialogClickListener {
+    fun onSingleViewClick(view: View)
+    fun onMultiViewClick(view: View)
+    fun onSaveAllViewsClick(view: View)
+}
+
+class FunctionDialog(context: Context, private val clickListener: FunctionDialogClickListener) :
+    Dialog(context, android.R.style.Theme_DeviceDefault_Light_Dialog) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AnkoContext.create(context)
@@ -33,6 +41,7 @@ class FunctionDialog(context: Context) : Dialog(context, android.R.style.Theme_D
                 verticalLayout {
                     button("选择单个View") {
                         onClick {
+                            clickListener.onSingleViewClick(this@button)
                             selectSingleView(context.activity())
                             dismiss()
                         }
@@ -41,6 +50,7 @@ class FunctionDialog(context: Context) : Dialog(context, android.R.style.Theme_D
                     }
                     button("选择多个View") {
                         onClick {
+                            clickListener.onMultiViewClick(this@button)
                             Toast.makeText(context, "选择多个View", Toast.LENGTH_SHORT).show()
                             dismiss()
 
@@ -50,6 +60,7 @@ class FunctionDialog(context: Context) : Dialog(context, android.R.style.Theme_D
                     }
                     button("保存全部") {
                         onClick {
+                            clickListener.onSaveAllViewsClick(this@button)
                             saveall(context.activity())
                             dismiss()
                         }
