@@ -17,9 +17,8 @@ object AppIconLoader {
     /**
      * 异步加载App的Icon，设置到ImageView上,处理了列表错位的问题
      */
-    fun loadAppIcon(appId: String, imageView: ImageView) {
-        val imageViewRef: WeakReference<ImageView> = WeakReference(imageView)
-        val packageManager = imageView.context.applicationContext.packageManager
+    fun loadAppIcon(appId: String, imageViewRef: WeakReference<ImageView>) {
+        val packageManager = imageViewRef.get()!!.context.applicationContext.packageManager
         imageViewRef.get()?.setTag(R.id.ImageViewTagAppId, appId)
         Maybe
             .defer {

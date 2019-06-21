@@ -2,7 +2,10 @@ package com.pokercc.saveappimage.plugin
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
+import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 
 /**
@@ -39,30 +42,51 @@ class StateView(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int
             changeState(value)
         }
 
+    var onCloseFunctionListener: OnCloseFunctionListener? = null
 
     private fun changeState(state: State) = when (state) {
         State.NORMAL -> {
-            textView.text = "保存"
-
+            messageTextView.text = "保存"
+            button.text = "关闭"
         }
         State.SINGLE_VIEW_MODE -> {
-            textView.text = "单个VIEW"
-
+            messageTextView.text = "单个VIEW"
+            button.text = "关闭"
         }
         State.MULTI_VIEW_MODE -> {
-            textView.text = "多个VIEW"
+            messageTextView.text = "多个VIEW"
+            button.text = "关闭"
+
         }
         State.SAVE_ALL_MODE -> {
-            textView.text = "保存全部"
+            messageTextView.text = "保存全部"
+            button.text = "关闭"
         }
     }
 
-    private lateinit var textView: TextView
+    private lateinit var messageTextView: TextView
+    private lateinit var button: Button
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        if (!this::textView.isInitialized) {
-            textView = TextView(context)
-            addView(textView)
+        if (!this::messageTextView.isInitialized) {
+            messageTextView = TextView(context)
+            button = Button(context)
+            LinearLayout(context)
+                .apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    addView(messageTextView)
+                    addView(button)
+
+                }
+                .run {
+                    this@StateView.addView(this)
+                }
+
+            button.setOnClickListener {
+                onCloseFunctionListener?.onClose(it)
+            }
+
+
         }
         state = state
 
@@ -71,6 +95,10 @@ class StateView(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
 
+    }
+
+    interface OnCloseFunctionListener {
+        fun onClose(view: View)
     }
 
 }

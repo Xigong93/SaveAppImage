@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.navigation.Navigation
 import kotlinx.android.synthetic.main.edit_app_list_fragment.*
+import java.lang.ref.WeakReference
 
 
 /**
@@ -103,7 +104,7 @@ private class EditAppViewHolder(viewGroup: ViewGroup) :
 
 
     fun render(appItem: EditAppListViewModel.AppItem) {
-        AppIconLoader.loadAppIcon(appItem.appEntity.appId, appIcon)
+        AppIconLoader.loadAppIcon(appItem.appEntity.appId, WeakReference(appIcon))
         appName.text = appItem.appEntity.name
         appId.text = appItem.appEntity.appId
         // 去掉之前的监听器，避免设置下面的状态产生影响

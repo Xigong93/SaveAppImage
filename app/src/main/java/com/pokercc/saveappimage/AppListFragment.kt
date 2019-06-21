@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.navigation.Navigation
 import com.pokercc.saveappimage.database.AppEntity
 import kotlinx.android.synthetic.main.app_list_fragment.*
+import java.lang.ref.WeakReference
 
 
 /**
@@ -72,7 +73,7 @@ private class AppViewHolder(viewGroup: ViewGroup) :
 
 
     fun render(appEntity: AppEntity) {
-        AppIconLoader.loadAppIcon(appEntity.appId, appIcon)
+        AppIconLoader.loadAppIcon(appEntity.appId, WeakReference(appIcon))
         appName.text = appEntity.name
         appId.text = appEntity.appId
     }

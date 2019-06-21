@@ -6,12 +6,14 @@ android {
     compileSdkVersion 28
 
 
-
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
+
+        def providerName = "com.pokercc.saveappimage.database.AppListContentProvider"
+//        buildconfi 'String', 'PROVIDER_NAME', providerName
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
